@@ -1,13 +1,15 @@
 from django.contrib import messages
 from django.contrib.auth import get_user_model, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.db.models import Count
+from django.core.cache import cache
+from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.dateparse import parse_date
 
 from .forms import ContactForm, LoginForm, RegisterForm, StudentPredictionForm
 from .models import ContactMessage, StudentPrediction
 from .services import predict
+from .utils import is_rate_limited
 
 
 def home(request):
@@ -21,9 +23,17 @@ def home(request):
 @login_required(login_url="predictions:login")
 def student_form(request):
     if request.method == "POST":
+        if is_rate_limited(request, "predict", limit=12, window=300):
+            messages.error(request, "Too many prediction requests. Please wait a few minutes.")
+            form = StudentPredictionForm(request.POST)
+            return render(request, "predictions/student_form.html", {"form": form})
         form = StudentPredictionForm(request.POST)
         if form.is_valid():
-            label, confidence = predict(form.cleaned_data)
+            try:
+                label, confidence = predict(form.cleaned_data)
+            except Exception:
+                messages.error(request, "Prediction service unavailable. Please try again.")
+                return render(request, "predictions/student_form.html", {"form": form})
             record = StudentPrediction.objects.create(
                 user=request.user if request.user.is_authenticated else None,
                 full_name=form.cleaned_data["full_name"],
@@ -49,6 +59,7 @@ def student_form(request):
                 prediction=label,
                 confidence=confidence,
             )
+            cache.delete("staff_dashboard_stats")
             request.session["last_prediction_id"] = record.id
             return redirect("predictions:result", pk=record.id)
     else:
@@ -79,7 +90,15 @@ def result(request, pk=None):
 
 @user_passes_test(lambda u: u.is_staff, login_url="predictions:login")
 def records(request):
-    history = StudentPrediction.objects.all()
+    history = StudentPrediction.objects.only(
+        "full_name",
+        "age",
+        "g1",
+        "g2",
+        "absences",
+        "prediction",
+        "created_at",
+    )
     return render(request, "predictions/records.html", {"records": history})
 
 
@@ -97,9 +116,14 @@ def model_details(request):
 
 def contact(request):
     if request.method == "POST":
+        if is_rate_limited(request, "contact", limit=5, window=3600):
+            messages.error(request, "Too many messages. Please try again later.")
+            form = ContactForm(request.POST)
+            return render(request, "predictions/contact.html", {"form": form})
         form = ContactForm(request.POST)
         if form.is_valid():
             form.save()
+            cache.delete("staff_dashboard_stats")
             messages.success(request, "Thank you! Your message has been received.")
             return redirect("predictions:contact")
     else:
@@ -122,12 +146,30 @@ def analytics(request):
     if end_date:
         qs = qs.filter(created_at__date__lte=end_date)
 
-    totals = qs.count()
-    pass_count = qs.filter(prediction="PASS").count()
-    fail_count = qs.filter(prediction="FAIL").count()
+    cache_key = f"analytics:{request.user.id}:{result_filter}:{start_date}:{end_date}"
+    stats = cache.get(cache_key)
+    if not stats:
+        stats = qs.aggregate(
+            totals=Count("id"),
+            pass_count=Count("id", filter=Q(prediction="PASS")),
+            fail_count=Count("id", filter=Q(prediction="FAIL")),
+        )
+        cache.set(cache_key, stats, 30)
+
+    totals = stats["totals"]
+    pass_count = stats["pass_count"]
+    fail_count = stats["fail_count"]
     pass_rate = round((pass_count / totals) * 100, 2) if totals else 0
 
-    recent = qs.order_by("-created_at")[:8]
+    recent = qs.only(
+        "full_name",
+        "age",
+        "g1",
+        "g2",
+        "absences",
+        "prediction",
+        "created_at",
+    ).order_by("-created_at")[:8]
     chart_data = {
         "labels": ["PASS", "FAIL"],
         "values": [pass_count, fail_count],
@@ -150,13 +192,33 @@ def analytics(request):
 
 @user_passes_test(lambda u: u.is_staff, login_url="predictions:login")
 def dashboard(request):
-    totals = StudentPrediction.objects.count()
-    pass_count = StudentPrediction.objects.filter(prediction="PASS").count()
-    fail_count = StudentPrediction.objects.filter(prediction="FAIL").count()
+    cache_key = "staff_dashboard_stats"
+    stats = cache.get(cache_key)
+    if not stats:
+        stats = StudentPrediction.objects.aggregate(
+            totals=Count("id"),
+            pass_count=Count("id", filter=Q(prediction="PASS")),
+            fail_count=Count("id", filter=Q(prediction="FAIL")),
+        )
+        stats["user_count"] = get_user_model().objects.count()
+        stats["contact_count"] = ContactMessage.objects.count()
+        cache.set(cache_key, stats, 30)
+
+    totals = stats["totals"]
+    pass_count = stats["pass_count"]
+    fail_count = stats["fail_count"]
     pass_rate = round((pass_count / totals) * 100, 2) if totals else 0
-    recent = StudentPrediction.objects.order_by("-created_at")[:6]
-    user_count = get_user_model().objects.count()
-    contact_count = ContactMessage.objects.count()
+    recent = StudentPrediction.objects.only(
+        "full_name",
+        "age",
+        "g1",
+        "g2",
+        "absences",
+        "prediction",
+        "created_at",
+    ).order_by("-created_at")[:6]
+    user_count = stats["user_count"]
+    contact_count = stats["contact_count"]
 
     return render(
         request,
@@ -206,7 +268,15 @@ def user_management(request):
 
         return redirect("superadmin_users")
 
-    users = User.objects.order_by("-date_joined")
+    users = User.objects.only(
+        "id",
+        "username",
+        "email",
+        "is_staff",
+        "is_superuser",
+        "is_active",
+        "date_joined",
+    ).order_by("-date_joined")
     return render(request, "predictions/user_management.html", {"users": users})
 
 
@@ -214,6 +284,10 @@ def register(request):
     if request.user.is_authenticated:
         return redirect("predictions:student_dashboard")
     if request.method == "POST":
+        if is_rate_limited(request, "register", limit=3, window=3600):
+            messages.error(request, "Too many registration attempts. Please try again later.")
+            form = RegisterForm(request.POST)
+            return render(request, "predictions/register.html", {"form": form})
         form = RegisterForm(request.POST)
         if form.is_valid():
             user = form.save()
@@ -232,6 +306,10 @@ def login_view(request):
         return redirect("predictions:student_dashboard")
 
     if request.method == "POST":
+        if is_rate_limited(request, "login", limit=5, window=300):
+            messages.error(request, "Too many login attempts. Please wait a few minutes.")
+            form = LoginForm(request, data=request.POST)
+            return render(request, "predictions/login.html", {"form": form})
         form = LoginForm(request, data=request.POST)
         if form.is_valid():
             login(request, form.get_user())
@@ -271,5 +349,13 @@ def profile(request):
 
 @login_required(login_url="predictions:login")
 def student_history(request):
-    records = StudentPrediction.objects.filter(user=request.user)
+    records = StudentPrediction.objects.filter(user=request.user).only(
+        "full_name",
+        "age",
+        "g1",
+        "g2",
+        "absences",
+        "prediction",
+        "created_at",
+    )
     return render(request, "predictions/history.html", {"records": records})

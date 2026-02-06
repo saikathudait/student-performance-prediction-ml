@@ -225,6 +225,18 @@ class RegisterForm(UserCreationForm):
             raise ValidationError("Email is already registered.")
         return email
 
+    def clean_username(self):
+        username = self.cleaned_data["username"]
+        if User.objects.filter(username__iexact=username).exists():
+            raise ValidationError("Username is already taken.")
+        return username
+
+    def clean_full_name(self):
+        name = self.cleaned_data["full_name"].strip()
+        if not any(char.isalpha() for char in name):
+            raise ValidationError("Enter a valid full name.")
+        return name
+
     def save(self, commit=True):
         user = super().save(commit=False)
         user.email = self.cleaned_data["email"]

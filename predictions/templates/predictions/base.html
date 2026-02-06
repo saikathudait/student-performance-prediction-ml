@@ -5,11 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Student Performance Prediction{% endblock %}</title>
+    <link rel="icon" href="{% static 'predictions/img/favicon.svg' %}" type="image/svg+xml">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'predictions/css/styles.css' %}">
     <script defer src="{% static 'predictions/js/app.js' %}"></script>
+    <script defer src="{% static 'predictions/js/cookies.js' %}"></script>
     {% block extra_js %}{% endblock %}
 </head>
 <body>
@@ -18,30 +20,32 @@
     <div class="bg-grid"></div>
 
     <header class="site-header">
-        <a class="brand" href="{% url 'predictions:home' %}">
-            <span class="brand-mark">SP</span>
-            <span class="brand-text">Student Performance Lab</span>
-        </a>
-        <nav class="site-nav">
-            {% with current=request.resolver_match.url_name %}
-            {% if request.user.is_authenticated %}
-            <a href="{% url 'predictions:home' %}" class="nav-link {% if current == 'home' or current == 'student_dashboard' %}active{% endif %}">Home</a>
-            <a href="{% url 'predictions:form' %}" class="nav-link {% if current == 'form' %}active{% endif %}">Predict</a>
-            <a href="{% url 'predictions:analytics' %}" class="nav-link {% if current == 'analytics' %}active{% endif %}">Analytics</a>
-            <a href="{% url 'predictions:model_details' %}" class="nav-link {% if current == 'model_details' %}active{% endif %}">Insights</a>
-            <a href="{% url 'predictions:profile' %}" class="nav-link {% if current == 'profile' %}active{% endif %}">Profile</a>
-            <a href="{% url 'predictions:logout' %}" class="nav-link">Logout</a>
-            {% else %}
-            <a href="{% url 'predictions:home' %}" class="nav-link {% if current == 'home' %}active{% endif %}">Home</a>
-            <a href="{% url 'predictions:about' %}" class="nav-link {% if current == 'about' %}active{% endif %}">About</a>
-            <a href="{% url 'predictions:how_it_works' %}" class="nav-link {% if current == 'how_it_works' %}active{% endif %}">How It Works</a>
-            <a href="{% url 'predictions:model_details' %}" class="nav-link {% if current == 'model_details' %}active{% endif %}">Insights</a>
-            <a href="{% url 'predictions:contact' %}" class="nav-link {% if current == 'contact' %}active{% endif %}">Contact</a>
-            <a href="{% url 'predictions:login' %}" class="nav-link {% if current == 'login' %}active{% endif %}">Login</a>
-            <a href="{% url 'predictions:register' %}" class="nav-link {% if current == 'register' %}active{% endif %}">Register</a>
-            {% endif %}
-            {% endwith %}
-        </nav>
+        <div class="site-header-inner">
+            <a class="brand" href="{% url 'predictions:home' %}">
+                <span class="brand-mark">SP</span>
+                <span class="brand-text">Student Performance Lab</span>
+            </a>
+            <nav class="site-nav">
+                {% with current=request.resolver_match.url_name %}
+                {% if request.user.is_authenticated %}
+                <a href="{% url 'predictions:home' %}" class="nav-link {% if current == 'home' or current == 'student_dashboard' %}active{% endif %}">Home</a>
+                <a href="{% url 'predictions:form' %}" class="nav-link {% if current == 'form' %}active{% endif %}">Predict</a>
+                <a href="{% url 'predictions:analytics' %}" class="nav-link {% if current == 'analytics' %}active{% endif %}">Analytics</a>
+                <a href="{% url 'predictions:model_details' %}" class="nav-link {% if current == 'model_details' %}active{% endif %}">Insights</a>
+                <a href="{% url 'predictions:profile' %}" class="nav-link {% if current == 'profile' %}active{% endif %}">Profile</a>
+                <a href="{% url 'predictions:logout' %}" class="nav-link">Logout</a>
+                {% else %}
+                <a href="{% url 'predictions:home' %}" class="nav-link {% if current == 'home' %}active{% endif %}">Home</a>
+                <a href="{% url 'predictions:about' %}" class="nav-link {% if current == 'about' %}active{% endif %}">About</a>
+                <a href="{% url 'predictions:how_it_works' %}" class="nav-link {% if current == 'how_it_works' %}active{% endif %}">How It Works</a>
+                <a href="{% url 'predictions:model_details' %}" class="nav-link {% if current == 'model_details' %}active{% endif %}">Insights</a>
+                <a href="{% url 'predictions:contact' %}" class="nav-link {% if current == 'contact' %}active{% endif %}">Contact</a>
+                <a href="{% url 'predictions:login' %}" class="nav-link {% if current == 'login' %}active{% endif %}">Login</a>
+                <a href="{% url 'predictions:register' %}" class="nav-link {% if current == 'register' %}active{% endif %}">Register</a>
+                {% endif %}
+                {% endwith %}
+            </nav>
+        </div>
     </header>
 
     <main class="page">
@@ -67,5 +71,18 @@
             </div>
         </div>
     </footer>
+
+    <div id="cookie-banner" class="cookie-banner" role="dialog" aria-live="polite" aria-label="Cookie consent">
+        <div class="cookie-content">
+            <div>
+                <p class="cookie-title">We use cookies</p>
+                <p class="cookie-text">Cookies help us improve the experience and keep the app secure.</p>
+            </div>
+            <div class="cookie-actions">
+                <button class="btn btn-primary" id="cookie-accept" type="button">Accept</button>
+                <button class="btn btn-tertiary" id="cookie-decline" type="button">Decline</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

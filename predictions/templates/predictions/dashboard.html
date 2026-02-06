@@ -5,11 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Staff Dashboard</title>
+    <link rel="icon" href="{% static 'predictions/img/favicon.svg' %}" type="image/svg+xml">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'predictions/css/staff.css' %}">
     <script defer src="{% static 'predictions/js/staff.js' %}"></script>
+    <script defer src="{% static 'predictions/js/cookies.js' %}"></script>
 </head>
 <body class="staff-body">
     <header class="staff-topbar">
@@ -128,5 +130,18 @@
             </div>
         </div>
     </footer>
+
+    <div id="cookie-banner" class="cookie-banner staff-cookie" role="dialog" aria-live="polite" aria-label="Cookie consent">
+        <div class="cookie-content">
+            <div>
+                <p class="cookie-title">We use cookies</p>
+                <p class="cookie-text">Cookies help us improve the experience and keep the app secure.</p>
+            </div>
+            <div class="cookie-actions">
+                <button class="btn btn-primary" id="cookie-accept" type="button">Accept</button>
+                <button class="btn btn-tertiary" id="cookie-decline" type="button">Decline</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
