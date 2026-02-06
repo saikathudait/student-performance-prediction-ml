@@ -1,0 +1,287 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Management</title>
+    <link rel="icon" href="{% static 'predictions/img/favicon.svg' %}" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'predictions/css/staff.css' %}">
+    <script defer src="{% static 'predictions/js/staff.js' %}"></script>
+    <script defer src="{% static 'predictions/js/cookies.js' %}"></script>
+</head>
+<body class="staff-body">
+    <header class="staff-topbar">
+        <div class="brand">
+            <span class="brand-mark">SP</span>
+            <div>
+                <p class="brand-title">Student Performance Admin</p>
+                <p class="brand-sub">Staff Control Center</p>
+            </div>
+        </div>
+        <div class="topbar-right">
+            <nav class="staff-nav">
+                <a class="nav-link" href="{% url 'predictions:dashboard' %}">Dashboard</a>
+                <a class="nav-link" href="{% url 'predictions:records' %}">All Predictions</a>
+                <a class="nav-link" href="{% url 'predictions:analytics' %}">Analytics</a>
+                <a class="nav-link active" href="{% url 'superadmin_exams' %}">Exam Management</a>
+                <a class="nav-link" href="{% url 'predictions:form' %}">Create Prediction</a>
+                <a class="nav-link" href="{% url 'predictions:contact' %}">Feedback Inbox</a>
+                <a class="nav-link" href="{% url 'superadmin_users' %}">User Management</a>
+                <a class="nav-link nav-logout" href="{% url 'predictions:logout' %}">Logout</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="staff-shell">
+        <main class="staff-content">
+            <section class="staff-hero">
+                <div>
+                    <p class="staff-eyebrow">Administration</p>
+                    <h1>Exam Management</h1>
+                    <p class="staff-lead">Create subjects, add questions, and monitor student exam outcomes.</p>
+                </div>
+                <div class="staff-clock" id="staff-clock">--:--</div>
+            </section>
+
+            {% if messages %}
+            <section class="staff-panel">
+                {% for message in messages %}
+                <p class="staff-message">{{ message }}</p>
+                {% endfor %}
+            </section>
+            {% endif %}
+
+            <section class="staff-panel">
+                <div class="panel-header">
+                    <div>
+                        <h2>Exam Subjects</h2>
+                        <p class="panel-sub">Define subject rules so students can select the right exam track.</p>
+                    </div>
+                </div>
+
+                <div class="split-grid">
+                    <div>
+                        <h3>Add Subject</h3>
+                        <form class="staff-form" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="add_subject">
+                            {{ subject_form.non_field_errors }}
+                            <div class="staff-form-grid">
+                                <div class="form-field">
+                                    {{ subject_form.name.label_tag }}
+                                    {{ subject_form.name }}
+                                    {% if subject_form.name.errors %}{{ subject_form.name.errors }}{% endif %}
+                                </div>
+                                <div class="form-field">
+                                    {{ subject_form.time_limit_minutes.label_tag }}
+                                    {{ subject_form.time_limit_minutes }}
+                                    <span class="help-text">Minutes allowed for the exam.</span>
+                                    {% if subject_form.time_limit_minutes.errors %}{{ subject_form.time_limit_minutes.errors }}{% endif %}
+                                </div>
+                                <div class="form-field">
+                                    {{ subject_form.pass_percentage.label_tag }}
+                                    {{ subject_form.pass_percentage }}
+                                    <span class="help-text">Minimum percentage required to pass.</span>
+                                    {% if subject_form.pass_percentage.errors %}{{ subject_form.pass_percentage.errors }}{% endif %}
+                                </div>
+                                <div class="form-field">
+                                    {{ subject_form.negative_marking.label_tag }}
+                                    {{ subject_form.negative_marking }}
+                                    <span class="help-text">Penalty for wrong answers (optional).</span>
+                                    {% if subject_form.negative_marking.errors %}{{ subject_form.negative_marking.errors }}{% endif %}
+                                </div>
+                                <div class="form-field span-2">
+                                    {{ subject_form.description.label_tag }}
+                                    {{ subject_form.description }}
+                                    {% if subject_form.description.errors %}{{ subject_form.description.errors }}{% endif %}
+                                </div>
+                                <div class="form-field">
+                                    <label for="{{ subject_form.is_active.id_for_label }}">Active</label>
+                                    <div class="checkbox-field">
+                                        {{ subject_form.is_active }}
+                                        <span>Available for students</span>
+                                    </div>
+                                    {% if subject_form.is_active.errors %}{{ subject_form.is_active.errors }}{% endif %}
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button class="btn btn-primary" type="submit">Add Subject</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div>
+                        <h3>Current Subjects</h3>
+                        <ul class="subject-list">
+                            {% for subject in subjects %}
+                            <li class="subject-item">
+                                <div style="display:flex; justify-content:space-between; align-items:center; gap:0.6rem;">
+                                    <strong>{{ subject.name }}</strong>
+                                    <span class="pill neutral">{% if subject.is_active %}Active{% else %}Inactive{% endif %}</span>
+                                </div>
+                                {% if subject.description %}
+                                <p class="panel-sub">{{ subject.description }}</p>
+                                {% endif %}
+                                <div class="subject-meta">
+                                    <span>Time: {{ subject.time_limit_minutes }} min</span>
+                                    <span>Pass: {{ subject.pass_percentage }}%</span>
+                                    <span>Negative: {% if subject.negative_marking %}{{ subject.negative_marking }}{% else %}None{% endif %}</span>
+                                </div>
+                            </li>
+                            {% empty %}
+                            <li class="subject-item empty">No subjects added yet.</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section class="staff-panel">
+                <div class="panel-header">
+                    <div>
+                        <h2>Add Exam Question</h2>
+                        <p class="panel-sub">Attach questions to a subject and set the correct option.</p>
+                    </div>
+                </div>
+                <form class="staff-form" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="add_question">
+                    {{ question_form.non_field_errors }}
+                    <div class="staff-form-grid">
+                        <div class="form-field">
+                            {{ question_form.subject.label_tag }}
+                            {{ question_form.subject }}
+                            {% if question_form.subject.errors %}{{ question_form.subject.errors }}{% endif %}
+                        </div>
+                        <div class="form-field">
+                            {{ question_form.points.label_tag }}
+                            {{ question_form.points }}
+                            <span class="help-text">Points awarded for correct answer.</span>
+                            {% if question_form.points.errors %}{{ question_form.points.errors }}{% endif %}
+                        </div>
+                        <div class="form-field span-2">
+                            {{ question_form.text.label_tag }}
+                            {{ question_form.text }}
+                            {% if question_form.text.errors %}{{ question_form.text.errors }}{% endif %}
+                        </div>
+                        <div class="form-field">
+                            {{ question_form.option_a.label_tag }}
+                            {{ question_form.option_a }}
+                            {% if question_form.option_a.errors %}{{ question_form.option_a.errors }}{% endif %}
+                        </div>
+                        <div class="form-field">
+                            {{ question_form.option_b.label_tag }}
+                            {{ question_form.option_b }}
+                            {% if question_form.option_b.errors %}{{ question_form.option_b.errors }}{% endif %}
+                        </div>
+                        <div class="form-field">
+                            {{ question_form.option_c.label_tag }}
+                            {{ question_form.option_c }}
+                            {% if question_form.option_c.errors %}{{ question_form.option_c.errors }}{% endif %}
+                        </div>
+                        <div class="form-field">
+                            {{ question_form.option_d.label_tag }}
+                            {{ question_form.option_d }}
+                            {% if question_form.option_d.errors %}{{ question_form.option_d.errors }}{% endif %}
+                        </div>
+                        <div class="form-field">
+                            {{ question_form.correct_option.label_tag }}
+                            {{ question_form.correct_option }}
+                            {% if question_form.correct_option.errors %}{{ question_form.correct_option.errors }}{% endif %}
+                        </div>
+                        <div class="form-field">
+                            <label for="{{ question_form.is_active.id_for_label }}">Active</label>
+                            <div class="checkbox-field">
+                                {{ question_form.is_active }}
+                                <span>Visible to students</span>
+                            </div>
+                            {% if question_form.is_active.errors %}{{ question_form.is_active.errors }}{% endif %}
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button class="btn btn-primary" type="submit">Add Question</button>
+                    </div>
+                </form>
+            </section>
+
+            <section class="staff-panel">
+                <div class="panel-header">
+                    <div>
+                        <h2>Exam History</h2>
+                        <p class="panel-sub">Latest exam attempts across all students.</p>
+                    </div>
+                    <input id="staff-search" class="panel-search" type="search" placeholder="Search by student or subject...">
+                </div>
+                <div class="table-wrapper">
+                    <table class="staff-table">
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Subject</th>
+                                <th>Score</th>
+                                <th>Correct</th>
+                                <th>Wrong</th>
+                                <th>Percentage</th>
+                                <th>Result</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="staff-table-body">
+                            {% for item in results %}
+                            <tr>
+                                <td>{{ item.user.username }}</td>
+                                <td>{{ item.subject.name }}</td>
+                                <td>{{ item.score }}</td>
+                                <td>{{ item.correct_count }}</td>
+                                <td>{{ item.wrong_count }}</td>
+                                <td>{{ item.percentage }}%</td>
+                                <td>
+                                    <span class="pill {% if item.passed %}pass{% else %}fail{% endif %}">
+                                        {% if item.passed %}PASS{% else %}FAIL{% endif %}
+                                    </span>
+                                </td>
+                                <td>{{ item.created_at|date:"M d, Y H:i" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="8" class="empty">No exam attempts yet.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <footer class="staff-footer">
+        <div class="staff-footer-inner">
+            <div>
+                <p class="footer-title">Student Performance Admin</p>
+                <p class="footer-sub">Administrative oversight and system monitoring.</p>
+            </div>
+            <div class="footer-meta">
+                <p>Copyright 2026 Student Performance Lab</p>
+                <p>All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <div id="cookie-banner" class="cookie-banner staff-cookie" role="dialog" aria-live="polite" aria-label="Cookie consent">
+        <div class="cookie-content">
+            <div>
+                <p class="cookie-title">We use cookies</p>
+                <p class="cookie-text">Cookies help us improve the experience and keep the app secure.</p>
+            </div>
+            <div class="cookie-actions">
+                <button class="btn btn-primary" id="cookie-accept" type="button">Accept</button>
+                <button class="btn btn-tertiary" id="cookie-decline" type="button">Decline</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

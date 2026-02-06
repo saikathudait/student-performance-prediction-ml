@@ -55,6 +55,21 @@ class ContactMessage(models.Model):
         return f"{self.name} - {self.email}"
 
 
+class ExamSubject(models.Model):
+    name = models.CharField(max_length=120, unique=True)
+    description = models.TextField(blank=True)
+    time_limit_minutes = models.PositiveSmallIntegerField(default=15)
+    pass_percentage = models.PositiveSmallIntegerField(default=40)
+    negative_marking = models.FloatField(default=0)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ["name"]
+
+    def __str__(self):
+        return self.name
+
+
 class ExamQuestion(models.Model):
     OPTION_CHOICES = [
         ("A", "A"),
@@ -63,6 +78,11 @@ class ExamQuestion(models.Model):
         ("D", "D"),
     ]
 
+    subject = models.ForeignKey(
+        ExamSubject,
+        on_delete=models.CASCADE,
+        related_name="questions",
+    )
     text = models.TextField()
     option_a = models.CharField(max_length=255)
     option_b = models.CharField(max_length=255)
@@ -82,7 +102,12 @@ class ExamResult(models.Model):
         on_delete=models.CASCADE,
         related_name="exam_results",
     )
-    score = models.PositiveIntegerField()
+    subject = models.ForeignKey(
+        ExamSubject,
+        on_delete=models.CASCADE,
+        related_name="results",
+    )
+    score = models.FloatField()
     total_questions = models.PositiveIntegerField()
     correct_count = models.PositiveIntegerField()
     wrong_count = models.PositiveIntegerField()

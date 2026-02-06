@@ -10,8 +10,15 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.dateparse import parse_date
 from django.utils import timezone
 
-from .forms import ContactForm, LoginForm, RegisterForm, StudentPredictionForm
-from .models import ContactMessage, ExamQuestion, ExamResult, StudentPrediction
+from .forms import (
+    ContactForm,
+    ExamQuestionForm,
+    ExamSubjectForm,
+    LoginForm,
+    RegisterForm,
+    StudentPredictionForm,
+)
+from .models import ContactMessage, ExamQuestion, ExamResult, ExamSubject, StudentPrediction
 from .services import predict
 from .utils import is_rate_limited
 
@@ -125,6 +132,7 @@ def model_details(request):
 
 @login_required(login_url="predictions:login")
 def exam_instructions(request):
+    subjects = ExamSubject.objects.filter(is_active=True)
     total_questions = ExamQuestion.objects.filter(is_active=True).count()
     time_limit = settings.EXAM_TIME_LIMIT_MINUTES
     pass_percentage = settings.EXAM_PASS_PERCENTAGE
@@ -136,6 +144,7 @@ def exam_instructions(request):
         request,
         "predictions/exam_instructions.html",
         {
+            "subjects": subjects,
             "total_questions": total_questions,
             "time_limit": time_limit,
             "pass_percentage": pass_percentage,
@@ -148,12 +157,21 @@ def exam_instructions(request):
 
 @login_required(login_url="predictions:login")
 def exam(request):
-    questions = list(ExamQuestion.objects.filter(is_active=True))
-    if not questions:
-        messages.error(request, "No exam questions are available yet.")
+    subject_id = request.GET.get("subject") or request.POST.get("subject_id") or request.session.get("exam_subject_id")
+    subject = None
+    if subject_id:
+        subject = ExamSubject.objects.filter(pk=subject_id, is_active=True).first()
+
+    if not subject:
+        messages.error(request, "Please select a valid exam subject.")
         return redirect("predictions:exam_instructions")
 
-    time_limit_seconds = settings.EXAM_TIME_LIMIT_MINUTES * 60
+    questions = list(ExamQuestion.objects.filter(is_active=True, subject=subject))
+    if not questions:
+        messages.error(request, "No questions available for the selected subject.")
+        return redirect("predictions:exam_instructions")
+
+    time_limit_seconds = subject.time_limit_minutes * 60
 
     if request.method == "GET":
         if request.session.get("exam_submitted") and request.session.get("exam_last_result_id"):
@@ -166,6 +184,7 @@ def exam(request):
                 request.session["exam_in_progress"] = True
                 request.session["exam_started_at"] = timezone.now().timestamp()
                 request.session["exam_token"] = uuid.uuid4().hex
+                request.session["exam_subject_id"] = subject.id
             else:
                 return redirect("predictions:exam_instructions")
 
@@ -184,6 +203,7 @@ def exam(request):
                 "questions": questions,
                 "time_limit_seconds": time_limit_seconds,
                 "exam_token": request.session.get("exam_token"),
+                "subject": subject,
             },
         )
 
@@ -209,15 +229,16 @@ def exam(request):
             score += q.points
         else:
             wrong_count += 1
-            if settings.EXAM_NEGATIVE_MARKING:
-                score -= settings.EXAM_NEGATIVE_MARKING
+            if subject.negative_marking:
+                score -= subject.negative_marking
     score = max(0, score)
     percentage = round((score / total_marks) * 100, 2) if total_marks else 0
-    passed = percentage >= settings.EXAM_PASS_PERCENTAGE
+    passed = percentage >= subject.pass_percentage
 
     result = ExamResult.objects.create(
         user=request.user,
-        score=int(score),
+        subject=subject,
+        score=round(float(score), 2),
         total_questions=len(questions),
         correct_count=correct_count,
         wrong_count=wrong_count,
@@ -230,6 +251,7 @@ def exam(request):
     request.session["exam_in_progress"] = False
     request.session.pop("exam_started_at", None)
     request.session.pop("exam_token", None)
+    request.session.pop("exam_subject_id", None)
     request.session["last_exam_percentage"] = percentage
 
     return redirect("predictions:exam_result", pk=result.id)
@@ -243,7 +265,7 @@ def exam_result(request, pk):
 
 @login_required(login_url="predictions:login")
 def exam_history(request):
-    results = ExamResult.objects.filter(user=request.user)
+    results = ExamResult.objects.filter(user=request.user).select_related("subject")
     return render(request, "predictions/exam_history.html", {"results": results})
 
 
@@ -411,6 +433,41 @@ def user_management(request):
         "date_joined",
     ).order_by("-date_joined")
     return render(request, "predictions/user_management.html", {"users": users})
+
+
+@user_passes_test(lambda u: u.is_staff, login_url="predictions:login")
+def exam_management(request):
+    subject_form = ExamSubjectForm()
+    question_form = ExamQuestionForm()
+
+    if request.method == "POST":
+        action = request.POST.get("action")
+        if action == "add_subject":
+            subject_form = ExamSubjectForm(request.POST)
+            if subject_form.is_valid():
+                subject_form.save()
+                messages.success(request, "Subject added successfully.")
+                return redirect("superadmin_exams")
+        elif action == "add_question":
+            question_form = ExamQuestionForm(request.POST)
+            if question_form.is_valid():
+                question_form.save()
+                messages.success(request, "Question added successfully.")
+                return redirect("superadmin_exams")
+
+    subjects = ExamSubject.objects.order_by("name")
+    results = ExamResult.objects.select_related("user", "subject").order_by("-created_at")[:30]
+
+    return render(
+        request,
+        "predictions/exam_management.html",
+        {
+            "subject_form": subject_form,
+            "question_form": question_form,
+            "subjects": subjects,
+            "results": results,
+        },
+    )
 
 
 def register(request):

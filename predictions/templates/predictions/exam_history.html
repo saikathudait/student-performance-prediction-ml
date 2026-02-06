@@ -27,6 +27,7 @@
             <thead>
                 <tr>
                     <th>Date &amp; Time</th>
+                    <th>Subject</th>
                     <th>Score</th>
                     <th>Correct</th>
                     <th>Wrong</th>
@@ -39,6 +40,7 @@
                     {% for item in results %}
                     <tr>
                         <td>{{ item.created_at|date:"M d, Y H:i" }}</td>
+                        <td>{{ item.subject.name }}</td>
                         <td>{{ item.score }}</td>
                         <td>{{ item.correct_count }}</td>
                         <td>{{ item.wrong_count }}</td>
@@ -52,7 +54,7 @@
                     {% endfor %}
                 {% else %}
                     <tr>
-                        <td colspan="6" class="empty">No exam records yet.</td>
+                        <td colspan="7" class="empty">No exam records yet.</td>
                     </tr>
                 {% endif %}
             </tbody>

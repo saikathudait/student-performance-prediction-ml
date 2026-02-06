@@ -10,6 +10,7 @@ admin.site.index_title = "Administration"
 urlpatterns = [
     path("superadmin/", prediction_views.dashboard, name="superadmin"),
     path("superadmin/users/", prediction_views.user_management, name="superadmin_users"),
+    path("superadmin/exams/", prediction_views.exam_management, name="superadmin_exams"),
     path("django-admin/", admin.site.urls),
     path("", include("predictions.urls")),
 ]

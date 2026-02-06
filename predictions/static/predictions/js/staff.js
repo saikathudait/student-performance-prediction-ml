@@ -19,11 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
         search.addEventListener("input", (event) => {
             const value = event.target.value.toLowerCase();
             rows.forEach((row) => {
-                const nameCell = row.querySelector("td");
-                if (!nameCell) {
-                    return;
-                }
-                const matches = nameCell.textContent.toLowerCase().includes(value);
+                const matches = row.textContent.toLowerCase().includes(value);
                 row.style.display = matches ? "" : "none";
             });
         });

@@ -12,7 +12,7 @@
     <div>
         <p class="eyebrow">Online Exam</p>
         <h1>Student Assessment</h1>
-        <p class="hero-lead">Answer all questions before the timer ends.</p>
+        <p class="hero-lead">Subject: <strong>{{ subject.name }}</strong>. Answer all questions before the timer ends.</p>
     </div>
     <div class="exam-timer" data-duration="{{ time_limit_seconds }}" id="exam-timer">00:00</div>
 </section>
@@ -21,6 +21,7 @@
     <form id="exam-form" class="exam-form" method="post">
         {% csrf_token %}
         <input type="hidden" name="exam_token" value="{{ exam_token }}">
+        <input type="hidden" name="subject_id" value="{{ subject.id }}">
 
         {% for question in questions %}
         <article class="question-card">

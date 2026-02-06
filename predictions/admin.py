@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import ContactMessage, ExamQuestion, ExamResult, StudentPrediction
+from .models import ContactMessage, ExamQuestion, ExamResult, ExamSubject, StudentPrediction
 
 
 @admin.register(StudentPrediction)
@@ -28,13 +28,20 @@ class ContactMessageAdmin(admin.ModelAdmin):
 
 @admin.register(ExamQuestion)
 class ExamQuestionAdmin(admin.ModelAdmin):
-    list_display = ("text", "correct_option", "points", "is_active")
-    list_filter = ("is_active",)
+    list_display = ("text", "subject", "correct_option", "points", "is_active")
+    list_filter = ("is_active", "subject")
     search_fields = ("text",)
+
+
+@admin.register(ExamSubject)
+class ExamSubjectAdmin(admin.ModelAdmin):
+    list_display = ("name", "time_limit_minutes", "pass_percentage", "negative_marking", "is_active")
+    list_filter = ("is_active",)
+    search_fields = ("name",)
 
 
 @admin.register(ExamResult)
 class ExamResultAdmin(admin.ModelAdmin):
-    list_display = ("user", "score", "percentage", "passed", "created_at")
-    list_filter = ("passed", "created_at")
-    search_fields = ("user__username", "user__email")
+    list_display = ("user", "subject", "score", "percentage", "passed", "created_at")
+    list_filter = ("passed", "created_at", "subject")
+    search_fields = ("user__username", "user__email", "subject__name")

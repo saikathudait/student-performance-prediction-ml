@@ -3,7 +3,7 @@ from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 
-from .models import ContactMessage
+from .models import ContactMessage, ExamQuestion, ExamSubject
 
 YES_NO = [("yes", "Yes"), ("no", "No")]
 
@@ -285,4 +285,45 @@ class ContactForm(forms.ModelForm):
             "message": forms.Textarea(
                 attrs={"class": "input", "rows": 4, "placeholder": "Write your message"}
             ),
+        }
+
+
+class ExamSubjectForm(forms.ModelForm):
+    class Meta:
+        model = ExamSubject
+        fields = ("name", "description", "time_limit_minutes", "pass_percentage", "negative_marking", "is_active")
+        widgets = {
+            "name": forms.TextInput(attrs={"class": "input", "placeholder": "e.g., Mathematics"}),
+            "description": forms.Textarea(
+                attrs={"class": "input", "rows": 3, "placeholder": "Short description (optional)"}
+            ),
+            "time_limit_minutes": forms.NumberInput(attrs={"class": "input", "min": 5, "max": 120}),
+            "pass_percentage": forms.NumberInput(attrs={"class": "input", "min": 0, "max": 100}),
+            "negative_marking": forms.NumberInput(attrs={"class": "input", "min": 0, "step": "0.25"}),
+        }
+
+
+class ExamQuestionForm(forms.ModelForm):
+    class Meta:
+        model = ExamQuestion
+        fields = (
+            "subject",
+            "text",
+            "option_a",
+            "option_b",
+            "option_c",
+            "option_d",
+            "correct_option",
+            "points",
+            "is_active",
+        )
+        widgets = {
+            "subject": forms.Select(attrs={"class": "input"}),
+            "text": forms.Textarea(attrs={"class": "input", "rows": 3, "placeholder": "Question text"}),
+            "option_a": forms.TextInput(attrs={"class": "input", "placeholder": "Option A"}),
+            "option_b": forms.TextInput(attrs={"class": "input", "placeholder": "Option B"}),
+            "option_c": forms.TextInput(attrs={"class": "input", "placeholder": "Option C"}),
+            "option_d": forms.TextInput(attrs={"class": "input", "placeholder": "Option D"}),
+            "correct_option": forms.Select(attrs={"class": "input"}),
+            "points": forms.NumberInput(attrs={"class": "input", "min": 1}),
         }

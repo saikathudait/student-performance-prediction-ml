@@ -17,21 +17,43 @@
         <h2>Exam Rules</h2>
         <ul class="feature-list">
             <li>Total Questions: {{ total_questions }}</li>
-            <li>Time Limit: {{ time_limit }} minutes</li>
-            <li>Passing Criteria: {{ pass_percentage }}%</li>
+            <li>Default Time Limit: {{ time_limit }} minutes</li>
+            <li>Default Passing Criteria: {{ pass_percentage }}%</li>
             <li>Negative Marking: {% if negative_marking %}{{ negative_marking }} per wrong answer{% else %}None{% endif %}</li>
         </ul>
-        <p class="muted">Note: Do not refresh during the exam. The timer will auto-submit when time expires.</p>
-        <div class="form-actions">
-            {% if exam_in_progress %}
-            <a class="btn btn-primary" href="{% url 'predictions:exam' %}">Continue Exam</a>
-            {% else %}
-            <a class="btn btn-primary" href="{% url 'predictions:exam' %}?start=1">Start Exam</a>
-            {% endif %}
-            {% if last_result_id %}
-            <a class="btn btn-secondary" href="{% url 'predictions:exam_result' last_result_id %}">View Last Result</a>
-            {% endif %}
-        </div>
+        <p class="muted">Select a subject below to start. Do not refresh during the exam.</p>
     </div>
+</section>
+
+<section class="section" data-reveal>
+    <div class="card-grid">
+        {% for subject in subjects %}
+        <article class="card">
+            <h3>{{ subject.name }}</h3>
+            {% if subject.description %}<p>{{ subject.description }}</p>{% endif %}
+            <ul class="feature-list">
+                <li>Time Limit: {{ subject.time_limit_minutes }} minutes</li>
+                <li>Passing: {{ subject.pass_percentage }}%</li>
+                <li>Negative Marking: {% if subject.negative_marking %}{{ subject.negative_marking }}{% else %}None{% endif %}</li>
+            </ul>
+            <div class="form-actions">
+                {% if exam_in_progress %}
+                <a class="btn btn-primary" href="{% url 'predictions:exam' %}?subject={{ subject.id }}">Continue Exam</a>
+                {% else %}
+                <a class="btn btn-primary" href="{% url 'predictions:exam' %}?start=1&subject={{ subject.id }}">Start Exam</a>
+                {% endif %}
+            </div>
+        </article>
+        {% empty %}
+        <div class="card">
+            <p class="muted">No subjects available yet. Please contact the admin.</p>
+        </div>
+        {% endfor %}
+    </div>
+    {% if last_result_id %}
+    <div class="form-actions" style="margin-top:1.5rem;">
+        <a class="btn btn-secondary" href="{% url 'predictions:exam_result' last_result_id %}">View Last Result</a>
+    </div>
+    {% endif %}
 </section>
 {% endblock %}
