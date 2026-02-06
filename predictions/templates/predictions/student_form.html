@@ -17,6 +17,15 @@
     <div class="hero-badge">Instant Prediction</div>
 </section>
 
+{% if exam_score %}
+<section class="section" data-reveal>
+    <div class="glass-card">
+        <h3>Latest Exam Score</h3>
+        <p>You scored <strong>{{ exam_score }}%</strong> in the most recent exam.</p>
+    </div>
+</section>
+{% endif %}
+
 <section class="form-layout">
     <form id="student-form" class="form-card" method="post" novalidate>
         {% csrf_token %}

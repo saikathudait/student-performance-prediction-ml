@@ -525,6 +525,60 @@ button:focus-visible {
     transition: width 0.3s ease;
 }
 
+.exam-timer {
+    padding: 0.7rem 1.2rem;
+    border-radius: 999px;
+    background: rgba(14, 165, 233, 0.12);
+    color: var(--accent-dark);
+    font-weight: 700;
+    min-width: 120px;
+    text-align: center;
+    border: 1px solid rgba(14, 165, 233, 0.25);
+}
+
+.exam-form {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.question-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+}
+
+.question-card h3 {
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+
+.options {
+    display: grid;
+    gap: 0.8rem;
+}
+
+.option {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.7rem 0.9rem;
+    border-radius: 12px;
+    background: rgba(14, 165, 233, 0.08);
+    border: 1px solid rgba(14, 165, 233, 0.15);
+    cursor: pointer;
+}
+
+.option input {
+    accent-color: var(--accent);
+}
+
+.option input:checked + span {
+    font-weight: 600;
+    color: var(--accent-dark);
+}
+
 .result-layout {
     display: grid;
     gap: 2rem;

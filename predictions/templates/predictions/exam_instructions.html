@@ -1,0 +1,37 @@
+{% extends "predictions/base.html" %}
+
+{% block title %}Exam Instructions{% endblock %}
+
+{% block content %}
+<section class="page-hero" data-reveal>
+    <div>
+        <p class="eyebrow">Online Exam</p>
+        <h1>Exam Instructions</h1>
+        <p class="hero-lead">Read the rules before you begin the assessment.</p>
+    </div>
+    <div class="hero-badge">Student Exam</div>
+</section>
+
+<section class="section exam-instructions" data-reveal>
+    <div class="card">
+        <h2>Exam Rules</h2>
+        <ul class="feature-list">
+            <li>Total Questions: {{ total_questions }}</li>
+            <li>Time Limit: {{ time_limit }} minutes</li>
+            <li>Passing Criteria: {{ pass_percentage }}%</li>
+            <li>Negative Marking: {% if negative_marking %}{{ negative_marking }} per wrong answer{% else %}None{% endif %}</li>
+        </ul>
+        <p class="muted">Note: Do not refresh during the exam. The timer will auto-submit when time expires.</p>
+        <div class="form-actions">
+            {% if exam_in_progress %}
+            <a class="btn btn-primary" href="{% url 'predictions:exam' %}">Continue Exam</a>
+            {% else %}
+            <a class="btn btn-primary" href="{% url 'predictions:exam' %}?start=1">Start Exam</a>
+            {% endif %}
+            {% if last_result_id %}
+            <a class="btn btn-secondary" href="{% url 'predictions:exam_result' last_result_id %}">View Last Result</a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

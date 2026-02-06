@@ -53,3 +53,45 @@ class ContactMessage(models.Model):
 
     def __str__(self):
         return f"{self.name} - {self.email}"
+
+
+class ExamQuestion(models.Model):
+    OPTION_CHOICES = [
+        ("A", "A"),
+        ("B", "B"),
+        ("C", "C"),
+        ("D", "D"),
+    ]
+
+    text = models.TextField()
+    option_a = models.CharField(max_length=255)
+    option_b = models.CharField(max_length=255)
+    option_c = models.CharField(max_length=255)
+    option_d = models.CharField(max_length=255)
+    correct_option = models.CharField(max_length=1, choices=OPTION_CHOICES)
+    points = models.PositiveSmallIntegerField(default=1)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.text[:60]
+
+
+class ExamResult(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="exam_results",
+    )
+    score = models.PositiveIntegerField()
+    total_questions = models.PositiveIntegerField()
+    correct_count = models.PositiveIntegerField()
+    wrong_count = models.PositiveIntegerField()
+    percentage = models.FloatField()
+    passed = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.user} - {self.percentage:.1f}%"

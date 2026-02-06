@@ -95,6 +95,11 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 MODEL_PATH = BASE_DIR / "best_student_model.pkl"
 LOAD_MODEL_ON_STARTUP = os.getenv("LOAD_MODEL_ON_STARTUP", "1") == "1"
 
+# Exam module settings
+EXAM_TIME_LIMIT_MINUTES = int(os.getenv("EXAM_TIME_LIMIT_MINUTES", "15"))
+EXAM_PASS_PERCENTAGE = int(os.getenv("EXAM_PASS_PERCENTAGE", "40"))
+EXAM_NEGATIVE_MARKING = float(os.getenv("EXAM_NEGATIVE_MARKING", "0"))
+
 # Security defaults (enable in production via env flags)
 SECURE_SSL_REDIRECT = os.getenv("SECURE_SSL_REDIRECT", "0") == "1"
 SESSION_COOKIE_SECURE = os.getenv("SESSION_COOKIE_SECURE", "0") == "1"

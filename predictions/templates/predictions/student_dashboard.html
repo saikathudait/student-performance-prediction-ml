@@ -33,6 +33,11 @@
         <a class="btn btn-primary" href="{% url 'predictions:form' %}">Start Prediction</a>
     </article>
     <article class="card">
+        <h3>Take Exam</h3>
+        <p>Attempt the online exam and record your score.</p>
+        <a class="btn btn-secondary" href="{% url 'predictions:exam_instructions' %}">Start Exam</a>
+    </article>
+    <article class="card">
         <h3>View My Predictions</h3>
         <p>Review your past predictions and outcomes.</p>
         <a class="btn btn-secondary" href="{% url 'predictions:history' %}">My History</a>

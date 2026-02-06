@@ -1,0 +1,48 @@
+{% extends "predictions/base.html" %}
+
+{% block title %}Exam Result{% endblock %}
+
+{% block content %}
+<section class="page-hero" data-reveal>
+    <div>
+        <p class="eyebrow">Exam Result</p>
+        <h1>Your Exam Outcome</h1>
+        <p class="hero-lead">Review your performance and next steps.</p>
+    </div>
+</section>
+
+<section class="section result-layout">
+    <div class="result-card {% if result.passed %}pass{% else %}fail{% endif %}" data-reveal>
+        <div class="result-header">
+            <h2>Result: {% if result.passed %}PASS{% else %}FAIL{% endif %}</h2>
+            <span class="pill {% if result.passed %}pass{% else %}fail{% endif %}">
+                {{ result.percentage }}%
+            </span>
+        </div>
+        <p class="result-sub">Exam score summary</p>
+        <div class="summary-grid">
+            <div>
+                <span>Total Questions</span>
+                <strong>{{ result.total_questions }}</strong>
+            </div>
+            <div>
+                <span>Correct</span>
+                <strong>{{ result.correct_count }}</strong>
+            </div>
+            <div>
+                <span>Wrong</span>
+                <strong>{{ result.wrong_count }}</strong>
+            </div>
+            <div>
+                <span>Score</span>
+                <strong>{{ result.score }}</strong>
+            </div>
+        </div>
+        <div class="result-actions">
+            <a class="btn btn-primary" href="{% url 'predictions:form' %}">Go to Prediction</a>
+            <a class="btn btn-secondary" href="{% url 'predictions:analytics' %}">View Analytics</a>
+            <a class="btn btn-tertiary" href="{% url 'predictions:exam_history' %}">Exam History</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

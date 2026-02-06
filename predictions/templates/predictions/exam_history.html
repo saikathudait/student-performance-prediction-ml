@@ -1,0 +1,62 @@
+{% extends "predictions/base.html" %}
+
+{% block title %}Exam History{% endblock %}
+
+{% block content %}
+<section class="page-hero" data-reveal>
+    <div>
+        <p class="eyebrow">Exam History</p>
+        <h1>Your Exam Attempts</h1>
+        <p class="hero-lead">All previous exams taken by you.</p>
+    </div>
+</section>
+
+<section class="records-panel" data-reveal>
+    <div class="records-header">
+        <div>
+            <h2>Exam Records</h2>
+            <p class="muted">{{ results|length }} total record{{ results|length|pluralize }}</p>
+        </div>
+        <div class="records-actions">
+            <a class="btn btn-primary" href="{% url 'predictions:exam_instructions' %}">New Exam</a>
+        </div>
+    </div>
+
+    <div class="table-wrapper">
+        <table class="records-table">
+            <thead>
+                <tr>
+                    <th>Date &amp; Time</th>
+                    <th>Score</th>
+                    <th>Correct</th>
+                    <th>Wrong</th>
+                    <th>Percentage</th>
+                    <th>Result</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if results %}
+                    {% for item in results %}
+                    <tr>
+                        <td>{{ item.created_at|date:"M d, Y H:i" }}</td>
+                        <td>{{ item.score }}</td>
+                        <td>{{ item.correct_count }}</td>
+                        <td>{{ item.wrong_count }}</td>
+                        <td>{{ item.percentage }}%</td>
+                        <td>
+                            <span class="pill {% if item.passed %}pass{% else %}fail{% endif %}">
+                                {% if item.passed %}PASS{% else %}FAIL{% endif %}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="6" class="empty">No exam records yet.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

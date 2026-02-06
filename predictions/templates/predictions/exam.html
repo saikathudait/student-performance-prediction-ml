@@ -1,0 +1,55 @@
+{% extends "predictions/base.html" %}
+{% load static %}
+
+{% block title %}Exam{% endblock %}
+
+{% block extra_js %}
+<script defer src="{% static 'predictions/js/exam.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+<section class="page-hero" data-reveal>
+    <div>
+        <p class="eyebrow">Online Exam</p>
+        <h1>Student Assessment</h1>
+        <p class="hero-lead">Answer all questions before the timer ends.</p>
+    </div>
+    <div class="exam-timer" data-duration="{{ time_limit_seconds }}" id="exam-timer">00:00</div>
+</section>
+
+<section class="section">
+    <form id="exam-form" class="exam-form" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="exam_token" value="{{ exam_token }}">
+
+        {% for question in questions %}
+        <article class="question-card">
+            <h3>Q{{ forloop.counter }}. {{ question.text }}</h3>
+            <div class="options">
+                <label class="option">
+                    <input type="radio" name="question_{{ question.id }}" value="A">
+                    <span>{{ question.option_a }}</span>
+                </label>
+                <label class="option">
+                    <input type="radio" name="question_{{ question.id }}" value="B">
+                    <span>{{ question.option_b }}</span>
+                </label>
+                <label class="option">
+                    <input type="radio" name="question_{{ question.id }}" value="C">
+                    <span>{{ question.option_c }}</span>
+                </label>
+                <label class="option">
+                    <input type="radio" name="question_{{ question.id }}" value="D">
+                    <span>{{ question.option_d }}</span>
+                </label>
+            </div>
+        </article>
+        {% endfor %}
+
+        <div class="form-actions">
+            <button class="btn btn-primary" type="submit">Submit Exam</button>
+            <a class="btn btn-tertiary" href="{% url 'predictions:exam_instructions' %}">Cancel</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

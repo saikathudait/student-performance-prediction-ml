@@ -29,6 +29,7 @@
                 {% with current=request.resolver_match.url_name %}
                 {% if request.user.is_authenticated %}
                 <a href="{% url 'predictions:home' %}" class="nav-link {% if current == 'home' or current == 'student_dashboard' %}active{% endif %}">Home</a>
+                <a href="{% url 'predictions:exam_instructions' %}" class="nav-link {% if current == 'exam_instructions' or current == 'exam' or current == 'exam_result' or current == 'exam_history' %}active{% endif %}">Exam</a>
                 <a href="{% url 'predictions:form' %}" class="nav-link {% if current == 'form' %}active{% endif %}">Predict</a>
                 <a href="{% url 'predictions:analytics' %}" class="nav-link {% if current == 'analytics' %}active{% endif %}">Analytics</a>
                 <a href="{% url 'predictions:model_details' %}" class="nav-link {% if current == 'model_details' %}active{% endif %}">Insights</a>

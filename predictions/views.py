@@ -1,3 +1,6 @@
+import uuid
+
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -5,9 +8,10 @@ from django.core.cache import cache
 from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.dateparse import parse_date
+from django.utils import timezone
 
 from .forms import ContactForm, LoginForm, RegisterForm, StudentPredictionForm
-from .models import ContactMessage, StudentPrediction
+from .models import ContactMessage, ExamQuestion, ExamResult, StudentPrediction
 from .services import predict
 from .utils import is_rate_limited
 
@@ -65,7 +69,12 @@ def student_form(request):
     else:
         form = StudentPredictionForm()
 
-    return render(request, "predictions/student_form.html", {"form": form})
+    exam_score = request.session.get("last_exam_percentage")
+    return render(
+        request,
+        "predictions/student_form.html",
+        {"form": form, "exam_score": exam_score},
+    )
 
 
 @login_required(login_url="predictions:login")
@@ -112,6 +121,130 @@ def how_it_works(request):
 
 def model_details(request):
     return render(request, "predictions/model_details.html")
+
+
+@login_required(login_url="predictions:login")
+def exam_instructions(request):
+    total_questions = ExamQuestion.objects.filter(is_active=True).count()
+    time_limit = settings.EXAM_TIME_LIMIT_MINUTES
+    pass_percentage = settings.EXAM_PASS_PERCENTAGE
+    negative_marking = settings.EXAM_NEGATIVE_MARKING
+    exam_in_progress = request.session.get("exam_in_progress", False)
+    last_result_id = request.session.get("exam_last_result_id")
+
+    return render(
+        request,
+        "predictions/exam_instructions.html",
+        {
+            "total_questions": total_questions,
+            "time_limit": time_limit,
+            "pass_percentage": pass_percentage,
+            "negative_marking": negative_marking,
+            "exam_in_progress": exam_in_progress,
+            "last_result_id": last_result_id,
+        },
+    )
+
+
+@login_required(login_url="predictions:login")
+def exam(request):
+    questions = list(ExamQuestion.objects.filter(is_active=True))
+    if not questions:
+        messages.error(request, "No exam questions are available yet.")
+        return redirect("predictions:exam_instructions")
+
+    time_limit_seconds = settings.EXAM_TIME_LIMIT_MINUTES * 60
+
+    if request.method == "GET":
+        if request.session.get("exam_submitted") and request.session.get("exam_last_result_id"):
+            if request.GET.get("start") != "1":
+                return redirect("predictions:exam_result", pk=request.session["exam_last_result_id"])
+            request.session["exam_submitted"] = False
+
+        if not request.session.get("exam_in_progress"):
+            if request.GET.get("start") == "1":
+                request.session["exam_in_progress"] = True
+                request.session["exam_started_at"] = timezone.now().timestamp()
+                request.session["exam_token"] = uuid.uuid4().hex
+            else:
+                return redirect("predictions:exam_instructions")
+
+        started_at = request.session.get("exam_started_at")
+        if started_at and (timezone.now().timestamp() - started_at) > time_limit_seconds:
+            request.session["exam_in_progress"] = False
+            request.session.pop("exam_started_at", None)
+            request.session.pop("exam_token", None)
+            messages.error(request, "Exam time expired. Please start again.")
+            return redirect("predictions:exam_instructions")
+
+        return render(
+            request,
+            "predictions/exam.html",
+            {
+                "questions": questions,
+                "time_limit_seconds": time_limit_seconds,
+                "exam_token": request.session.get("exam_token"),
+            },
+        )
+
+    # POST: Submit exam
+    if not request.session.get("exam_in_progress"):
+        messages.error(request, "No active exam session found.")
+        return redirect("predictions:exam_instructions")
+
+    token = request.POST.get("exam_token")
+    if token != request.session.get("exam_token"):
+        messages.error(request, "Invalid exam session. Please start again.")
+        return redirect("predictions:exam_instructions")
+
+    correct_count = 0
+    wrong_count = 0
+    total_marks = 0
+    score = 0
+    for q in questions:
+        total_marks += q.points
+        answer = request.POST.get(f"question_{q.id}")
+        if answer == q.correct_option:
+            correct_count += 1
+            score += q.points
+        else:
+            wrong_count += 1
+            if settings.EXAM_NEGATIVE_MARKING:
+                score -= settings.EXAM_NEGATIVE_MARKING
+    score = max(0, score)
+    percentage = round((score / total_marks) * 100, 2) if total_marks else 0
+    passed = percentage >= settings.EXAM_PASS_PERCENTAGE
+
+    result = ExamResult.objects.create(
+        user=request.user,
+        score=int(score),
+        total_questions=len(questions),
+        correct_count=correct_count,
+        wrong_count=wrong_count,
+        percentage=percentage,
+        passed=passed,
+    )
+
+    request.session["exam_last_result_id"] = result.id
+    request.session["exam_submitted"] = True
+    request.session["exam_in_progress"] = False
+    request.session.pop("exam_started_at", None)
+    request.session.pop("exam_token", None)
+    request.session["last_exam_percentage"] = percentage
+
+    return redirect("predictions:exam_result", pk=result.id)
+
+
+@login_required(login_url="predictions:login")
+def exam_result(request, pk):
+    result = get_object_or_404(ExamResult, pk=pk, user=request.user)
+    return render(request, "predictions/exam_result.html", {"result": result})
+
+
+@login_required(login_url="predictions:login")
+def exam_history(request):
+    results = ExamResult.objects.filter(user=request.user)
+    return render(request, "predictions/exam_history.html", {"results": results})
 
 
 def contact(request):
