@@ -37,7 +37,7 @@ The project demonstrates a complete **end-to-end ML workflow**, achieving **90%+
 ---
 
 ## Dataset Information
-
+ 
 - **Dataset Name:** Student Performance Dataset  
 - **Source:** Kaggle (UCI Machine Learning Repository)  
 - **Dataset Link:**  
@@ -211,3 +211,31 @@ Hyperparameter tuning
 Feature importance analysis
 
 Early-warning academic risk system
+
+---
+
+# Additional Web App Updates (New)
+
+## New Pages
+- About, How It Works, Insights, Contact
+- Student Dashboard, Profile, History
+- Staff Dashboard (`/superadmin/`)
+- User Management (`/superadmin/users/`)
+
+## Authentication & Roles
+- Students can register/login and view only their own history
+- Staff users are redirected to the staff dashboard after login
+- Login/Register hidden after authentication
+
+## Staff Features
+- Staff control panel with metrics and recent predictions
+- User management: toggle staff/admin/active status
+
+## Admin URLs
+- Staff panel: `http://127.0.0.1:8000/superadmin/`
+- Django admin (if needed): `http://127.0.0.1:8000/django-admin/`
+
+## UI Enhancements
+- Professional multi-page design
+- Advanced form validation and help text
+- Custom staff panel layout (not default Django admin)
