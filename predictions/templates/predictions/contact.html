@@ -1,0 +1,56 @@
+{% extends "predictions/base.html" %}
+
+{% block title %}Contact{% endblock %}
+
+{% block content %}
+<section class="page-hero" data-reveal>
+    <div>
+        <p class="eyebrow">Contact & Feedback</p>
+        <h1>Get in Touch</h1>
+        <p class="hero-lead">Share feedback or ask a question about the prediction system.</p>
+    </div>
+</section>
+
+<section class="section contact-layout" data-reveal>
+    <form class="form-card" method="post">
+        {% csrf_token %}
+        <div class="form-grid">
+            <label class="field">
+                <span>Name</span>
+                {{ form.name }}
+                <small class="error">{{ form.name.errors }}</small>
+            </label>
+            <label class="field">
+                <span>Email</span>
+                {{ form.email }}
+                <small class="error">{{ form.email.errors }}</small>
+            </label>
+            <label class="field">
+                <span>Message</span>
+                {{ form.message }}
+                <small class="error">{{ form.message.errors }}</small>
+            </label>
+            <label class="field">
+                <span>Was the prediction helpful?</span>
+                {{ form.usefulness }}
+                <small class="error">{{ form.usefulness.errors }}</small>
+            </label>
+        </div>
+        <div class="form-actions">
+            <button class="btn btn-primary" type="submit">Send Message</button>
+        </div>
+    </form>
+
+    <aside class="side-panel" data-reveal>
+        <div class="glass-card">
+            <h3>Why feedback matters</h3>
+            <p>Your feedback helps improve the experience and supports future updates.</p>
+            <ul class="feature-list">
+                <li>Improve input clarity</li>
+                <li>Refine prediction workflow</li>
+                <li>Enhance reporting</li>
+            </ul>
+        </div>
+    </aside>
+</section>
+{% endblock %}

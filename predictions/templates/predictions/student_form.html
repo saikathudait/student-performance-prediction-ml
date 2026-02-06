@@ -1,0 +1,199 @@
+{% extends "predictions/base.html" %}
+{% load static %}
+
+{% block title %}Student Prediction Form{% endblock %}
+
+{% block extra_js %}
+<script defer src="{% static 'predictions/js/form.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+<section class="page-hero" data-reveal>
+    <div>
+        <p class="eyebrow">Student Input Form</p>
+        <h1>Predict Student Performance</h1>
+        <p class="hero-lead">Enter academic and personal details to generate a pass/fail prediction instantly.</p>
+    </div>
+    <div class="hero-badge">Instant Prediction</div>
+</section>
+
+<section class="form-layout">
+    <form id="student-form" class="form-card" method="post" novalidate>
+        {% csrf_token %}
+
+        <div id="form-errors" class="form-errors" aria-live="polite">
+            {% if form.errors %}
+            <p>Please correct the highlighted fields.</p>
+            {% endif %}
+        </div>
+
+        <fieldset class="form-section">
+            <legend>Personal Details</legend>
+            <div class="form-grid">
+                <label class="field">
+                    <span>Full Name</span>
+                    {{ form.full_name }}
+                    <small class="help">{{ form.full_name.help_text }}</small>
+                    <small class="error">{{ form.full_name.errors }}</small>
+                </label>
+                <label class="field">
+                    <span>Age</span>
+                    {{ form.age }}
+                    <small class="help">{{ form.age.help_text }}</small>
+                    <small class="error">{{ form.age.errors }}</small>
+                </label>
+                <label class="field">
+                    <span>Gender</span>
+                    {{ form.gender }}
+                    <small class="help">{{ form.gender.help_text }}</small>
+                    <small class="error">{{ form.gender.errors }}</small>
+                </label>
+                <label class="field">
+                    <span>School</span>
+                    {{ form.school }}
+                    <small class="help">{{ form.school.help_text }}</small>
+                    <small class="error">{{ form.school.errors }}</small>
+                </label>
+                <label class="field">
+                    <span>Address</span>
+                    {{ form.address }}
+                    <small class="help">{{ form.address.help_text }}</small>
+                    <small class="error">{{ form.address.errors }}</small>
+                </label>
+            </div>
+        </fieldset>
+
+        <fieldset class="form-section">
+            <legend>Family & Background</legend>
+            <div class="form-grid">
+                <label class="field">
+                    <span>Family Size</span>
+                    {{ form.family_size }}
+                    <small class="help">{{ form.family_size.help_text }}</small>
+                    <small class="error">{{ form.family_size.errors }}</small>
+                </label>
+                <label class="field">
+                    <span>Parental Status</span>
+                    {{ form.parental_status }}
+                    <small class="help">{{ form.parental_status.help_text }}</small>
+                    <small class="error">{{ form.parental_status.errors }}</small>
+                </label>
+                <label class="field">
+                    <span>Mother Education (0-4)</span>
+                    {{ form.mother_education }}
+                    <small class="help">{{ form.mother_education.help_text }}</small>
+                    <small class="error">{{ form.mother_education.errors }}</small>
+                </label>
+                <label class="field">
+                    <span>Father Education (0-4)</span>
+                    {{ form.father_education }}
+                    <small class="help">{{ form.father_education.help_text }}</small>
+                    <small class="error">{{ form.father_education.errors }}</small>
+                </label>
+                <label class="field">
+                    <span>Guardian</span>
+                    {{ form.guardian }}
+                    <small class="help">{{ form.guardian.help_text }}</small>
+                    <small class="error">{{ form.guardian.errors }}</small>
+                </label>
+                <label class="field">
+                    <span>Family Support</span>
+                    {{ form.family_support }}
+                    <small class="help">{{ form.family_support.help_text }}</small>
+                    <small class="error">{{ form.family_support.errors }}</small>
+                </label>
+                <label class="field">
+                    <span>Internet Access</span>
+                    {{ form.internet_access }}
+                    <small class="help">{{ form.internet_access.help_text }}</small>
+                    <small class="error">{{ form.internet_access.errors }}</small>
+                </label>
+            </div>
+        </fieldset>
+
+        <fieldset class="form-section">
+            <legend>Academic & Behavioural Inputs</legend>
+            <div class="form-grid">
+                <label class="field">
+                    <span>Study Time (1-4)</span>
+                    {{ form.study_time }}
+                    <small class="help">{{ form.study_time.help_text }}</small>
+                    <small class="error">{{ form.study_time.errors }}</small>
+                </label>
+                <label class="field">
+                    <span>Travel Time (1-4)</span>
+                    {{ form.travel_time }}
+                    <small class="help">{{ form.travel_time.help_text }}</small>
+                    <small class="error">{{ form.travel_time.errors }}</small>
+                </label>
+                <label class="field">
+                    <span>Failures (0-3)</span>
+                    {{ form.failures }}
+                    <small class="help">{{ form.failures.help_text }}</small>
+                    <small class="error">{{ form.failures.errors }}</small>
+                </label>
+                <label class="field">
+                    <span>Absences</span>
+                    {{ form.absences }}
+                    <small class="help">{{ form.absences.help_text }}</small>
+                    <small class="error">{{ form.absences.errors }}</small>
+                </label>
+                <label class="field">
+                    <span>G1 (Past Score 1)</span>
+                    {{ form.g1 }}
+                    <small class="help">{{ form.g1.help_text }}</small>
+                    <small class="error">{{ form.g1.errors }}</small>
+                </label>
+                <label class="field">
+                    <span>G2 (Past Score 2)</span>
+                    {{ form.g2 }}
+                    <small class="help">{{ form.g2.help_text }}</small>
+                    <small class="error">{{ form.g2.errors }}</small>
+                </label>
+                <label class="field">
+                    <span>Extra Activities</span>
+                    {{ form.activities }}
+                    <small class="help">{{ form.activities.help_text }}</small>
+                    <small class="error">{{ form.activities.errors }}</small>
+                </label>
+                <label class="field">
+                    <span>Health (1-5)</span>
+                    {{ form.health }}
+                    <small class="help">{{ form.health.help_text }}</small>
+                    <small class="error">{{ form.health.errors }}</small>
+                </label>
+            </div>
+        </fieldset>
+
+        <div class="form-actions">
+            <button class="btn btn-primary" type="submit">Submit & Predict</button>
+            <button class="btn btn-tertiary" type="reset">Reset Form</button>
+        </div>
+    </form>
+
+    <aside class="side-panel" data-reveal>
+        <div class="glass-card">
+            <h3>Live Snapshot</h3>
+            <p>As you enter data, your academic summary updates instantly.</p>
+            <div class="snapshot">
+                <div>
+                    <span>G1 Score</span>
+                    <strong id="live-g1">0</strong>
+                </div>
+                <div>
+                    <span>G2 Score</span>
+                    <strong id="live-g2">0</strong>
+                </div>
+                <div>
+                    <span>Absences</span>
+                    <strong id="live-absences">0</strong>
+                </div>
+            </div>
+            <div class="progress">
+                <div class="progress-bar" id="score-progress"></div>
+            </div>
+            <p class="muted">Tip: keep scores between 0 and 20 for the most accurate prediction.</p>
+        </div>
+    </aside>
+</section>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends "predictions/base.html" %}
+
+{% block title %}Insights{% endblock %}
+
+{% block content %}
+<section class="page-hero" data-reveal>
+    <div>
+        <p class="eyebrow">Prediction Insights</p>
+        <h1>How the Prediction Is Informed</h1>
+        <p class="hero-lead">A clear, non-technical view of the data signals that guide each result.</p>
+    </div>
+</section>
+
+<section class="section info-grid" data-reveal>
+    <article class="card">
+        <h3>Data Snapshot</h3>
+        <p>Built on a sizable collection of student performance records.</p>
+    </article>
+    <article class="card">
+        <h3>Inputs Considered</h3>
+        <ul class="feature-list">
+            <li>Academic scores and attendance</li>
+            <li>Study habits and time allocation</li>
+            <li>Family background indicators</li>
+            <li>Wellbeing and activity levels</li>
+        </ul>
+    </article>
+    <article class="card">
+        <h3>Outcome</h3>
+        <p>The system delivers a clear PASS or FAIL decision with an academic summary.</p>
+    </article>
+</section>
+
+<section class="section layout-split" data-reveal>
+    <div>
+        <h2>Decision Logic</h2>
+        <p>
+            Past performance patterns help the system estimate how likely a student is to pass.
+            The focus is on providing a quick, understandable outcome for real-world use.
+        </p>
+    </div>
+    <div class="glass-card">
+        <h3>Quality Checks</h3>
+        <p>
+            Results are tested against historical data to ensure the predictions remain reliable
+            across a range of student profiles.
+        </p>
+    </div>
+</section>
+{% endblock %}

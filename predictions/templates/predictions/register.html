@@ -1,0 +1,70 @@
+{% extends "predictions/base.html" %}
+{% load static %}
+
+{% block extra_js %}
+<script defer src="{% static 'predictions/js/auth.js' %}"></script>
+{% endblock %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<section class="page-hero" data-reveal>
+    <div>
+        <p class="eyebrow">Create Account</p>
+        <h1>Student Registration</h1>
+        <p class="hero-lead">Create a secure account to save your predictions.</p>
+    </div>
+</section>
+
+<section class="section auth-layout" data-reveal>
+    <form class="form-card" method="post" id="register-form" novalidate>
+        {% csrf_token %}
+        <div id="auth-errors" class="form-errors"></div>
+        <div class="form-grid">
+            <label class="field">
+                <span>Full Name</span>
+                {{ form.full_name }}
+                <small class="error">{{ form.full_name.errors }}</small>
+            </label>
+            <label class="field">
+                <span>Email</span>
+                {{ form.email }}
+                <small class="error">{{ form.email.errors }}</small>
+            </label>
+            <label class="field">
+                <span>Username</span>
+                {{ form.username }}
+                <small class="error">{{ form.username.errors }}</small>
+            </label>
+            <label class="field">
+                <span>Password</span>
+                {{ form.password1 }}
+                <small class="error">{{ form.password1.errors }}</small>
+            </label>
+            <label class="field">
+                <span>Confirm Password</span>
+                {{ form.password2 }}
+                <small class="error">{{ form.password2.errors }}</small>
+            </label>
+        </div>
+        {% if form.non_field_errors %}
+        <div class="form-errors">{{ form.non_field_errors }}</div>
+        {% endif %}
+        <div class="form-actions">
+            <button class="btn btn-primary" type="submit">Create Account</button>
+            <a class="btn btn-tertiary" href="{% url 'predictions:login' %}">Login Instead</a>
+        </div>
+    </form>
+
+    <aside class="side-panel" data-reveal>
+        <div class="glass-card">
+            <h3>Registration Checklist</h3>
+            <ul class="feature-list">
+                <li>Valid email address</li>
+                <li>Unique username</li>
+                <li>Strong password</li>
+            </ul>
+        </div>
+    </aside>
+</section>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "predictions/base.html" %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+<section class="page-hero" data-reveal>
+    <div>
+        <p class="eyebrow">Student Profile</p>
+        <h1>{{ request.user.first_name|default:request.user.username }}</h1>
+        <p class="hero-lead">Your account details and prediction summary.</p>
+    </div>
+</section>
+
+<section class="section profile-layout" data-reveal>
+    <div class="card">
+        <h3>Profile Details</h3>
+        <ul class="feature-list">
+            <li>Name: {{ request.user.first_name|default:request.user.username }}</li>
+            <li>Email: {{ request.user.email|default:"Not set" }}</li>
+            <li>Joined: {{ request.user.date_joined|date:"M d, Y" }}</li>
+        </ul>
+    </div>
+    <div class="card">
+        <h3>Prediction Summary</h3>
+        <ul class="feature-list">
+            <li>Total Predictions: {{ prediction_count }}</li>
+            <li>Last Login: {{ request.user.last_login|date:"M d, Y H:i" }}</li>
+        </ul>
+    </div>
+</section>
+
+<section class="section" data-reveal>
+    <a class="btn btn-primary" href="{% url 'predictions:history' %}">View My Predictions</a>
+</section>
+{% endblock %}

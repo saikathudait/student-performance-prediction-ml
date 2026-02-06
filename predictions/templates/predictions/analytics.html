@@ -1,0 +1,110 @@
+{% extends "predictions/base.html" %}
+{% load static %}
+
+{% block title %}Analytics{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script defer src="{% static 'predictions/js/analytics.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+<section class="page-hero" data-reveal>
+    <div>
+        <p class="eyebrow">Prediction Analytics</p>
+        <h1>Insights & History</h1>
+        <p class="hero-lead">Track totals, pass/fail balance, and filter results by date or outcome.</p>
+    </div>
+</section>
+
+<section class="section stats-grid" data-reveal>
+    <div class="stat-card">
+        <span class="stat-label">Total Predictions</span>
+        <strong>{{ totals }}</strong>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">Pass Count</span>
+        <strong>{{ pass_count }}</strong>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">Fail Count</span>
+        <strong>{{ fail_count }}</strong>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">Pass Rate</span>
+        <strong>{{ pass_rate }}%</strong>
+    </div>
+</section>
+
+<section class="section analytics-layout" data-reveal>
+    <div class="card">
+        <h3>Pass vs Fail</h3>
+        <canvas id="resultChart" height="180"></canvas>
+        {{ chart_data|json_script:"chart-data" }}
+    </div>
+    <div class="card">
+        <h3>Filter Results</h3>
+        <form class="filter-form" method="get">
+            <label class="field">
+                <span>Start Date</span>
+                <input class="input" type="date" name="start" value="{{ request.GET.start }}">
+            </label>
+            <label class="field">
+                <span>End Date</span>
+                <input class="input" type="date" name="end" value="{{ request.GET.end }}">
+            </label>
+            <label class="field">
+                <span>Result</span>
+                <select class="input" name="result">
+                    <option value="">All</option>
+                    <option value="PASS" {% if request.GET.result == "PASS" %}selected{% endif %}>PASS</option>
+                    <option value="FAIL" {% if request.GET.result == "FAIL" %}selected{% endif %}>FAIL</option>
+                </select>
+            </label>
+            <button class="btn btn-primary" type="submit">Apply Filters</button>
+        </form>
+    </div>
+</section>
+
+<section class="section" data-reveal>
+    <h2>Recent Predictions</h2>
+    <div class="table-wrapper">
+        <table class="records-table">
+            <thead>
+                <tr>
+                    <th>Student Name</th>
+                    <th>Age</th>
+                    <th>G1</th>
+                    <th>G2</th>
+                    <th>Absences</th>
+                    <th>Prediction</th>
+                    <th>Date &amp; Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if recent %}
+                    {% for record in recent %}
+                    <tr>
+                        <td>{{ record.full_name }}</td>
+                        <td>{{ record.age }}</td>
+                        <td>{{ record.g1 }}</td>
+                        <td>{{ record.g2 }}</td>
+                        <td>{{ record.absences }}</td>
+                        <td>
+                            <span class="pill {% if record.prediction == 'PASS' %}pass{% else %}fail{% endif %}">
+                                {{ record.prediction }}
+                            </span>
+                        </td>
+                        <td>{{ record.created_at|date:"M d, Y H:i" }}</td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="empty">No predictions found for the selected filters.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

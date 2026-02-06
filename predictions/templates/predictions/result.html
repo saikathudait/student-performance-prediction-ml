@@ -1,0 +1,65 @@
+{% extends "predictions/base.html" %}
+
+{% block title %}Prediction Result{% endblock %}
+
+{% block content %}
+<section class="page-hero" data-reveal>
+    <div>
+        <p class="eyebrow">Prediction Result</p>
+        <h1>Performance Outcome</h1>
+        <p class="hero-lead">Here is the prediction for the submitted student profile.</p>
+    </div>
+</section>
+
+<section class="result-layout">
+    <div class="result-card {% if record.prediction == 'PASS' %}pass{% else %}fail{% endif %}" data-reveal>
+        <div class="result-header">
+            <h2>{{ record.full_name }}</h2>
+            <span class="pill {% if record.prediction == 'PASS' %}pass{% else %}fail{% endif %}">
+                {{ record.prediction }}
+            </span>
+        </div>
+        <p class="result-sub">Prediction based on academic, personal, and behavioural inputs.</p>
+        {% if confidence_percent is not None %}
+        <p class="confidence">Confidence Score: <strong>{{ confidence_percent }}%</strong></p>
+        {% endif %}
+
+        <div class="summary-grid">
+            <div>
+                <span>G1 Score</span>
+                <strong>{{ record.g1 }}</strong>
+            </div>
+            <div>
+                <span>G2 Score</span>
+                <strong>{{ record.g2 }}</strong>
+            </div>
+            <div>
+                <span>Absences</span>
+                <strong>{{ record.absences }}</strong>
+            </div>
+            <div>
+                <span>Study Time</span>
+                <strong>{{ record.study_time }}</strong>
+            </div>
+        </div>
+
+        <div class="result-actions">
+            <a class="btn btn-primary" href="{% url 'predictions:form' %}">Predict Another Student</a>
+            <a class="btn btn-secondary" href="{% url 'predictions:records' %}">View All Records</a>
+        </div>
+    </div>
+
+    <aside class="side-panel" data-reveal>
+        <div class="glass-card">
+            <h3>Academic Summary</h3>
+            <p>Use these insights during counselling sessions or internal reporting.</p>
+            <ul class="feature-list">
+                <li>Age: {{ record.age }}</li>
+                <li>School: {{ record.school }}</li>
+                <li>Guardian: {{ record.guardian|title }}</li>
+                <li>Internet Access: {{ record.internet_access|title }}</li>
+            </ul>
+        </div>
+    </aside>
+</section>
+{% endblock %}

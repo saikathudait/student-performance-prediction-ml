@@ -1,0 +1,50 @@
+{% extends "predictions/base.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<section class="page-hero" data-reveal>
+    <div>
+        <p class="eyebrow">Student Login</p>
+        <h1>Welcome Back</h1>
+        <p class="hero-lead">Log in to access your dashboard and prediction history.</p>
+    </div>
+</section>
+
+<section class="section auth-layout" data-reveal>
+    <form class="form-card" method="post">
+        {% csrf_token %}
+        <div class="form-grid">
+            <label class="field">
+                <span>Username or Email</span>
+                {{ form.username }}
+                <small class="error">{{ form.username.errors }}</small>
+            </label>
+            <label class="field">
+                <span>Password</span>
+                {{ form.password }}
+                <small class="error">{{ form.password.errors }}</small>
+            </label>
+        </div>
+        {% if form.non_field_errors %}
+        <div class="form-errors">{{ form.non_field_errors }}</div>
+        {% endif %}
+        <div class="form-actions">
+            <button class="btn btn-primary" type="submit">Login</button>
+            <a class="btn btn-tertiary" href="{% url 'predictions:register' %}">Create Account</a>
+        </div>
+    </form>
+
+    <aside class="side-panel" data-reveal>
+        <div class="glass-card">
+            <h3>Why login?</h3>
+            <p>Keep your predictions private and track your progress over time.</p>
+            <ul class="feature-list">
+                <li>Personal dashboard</li>
+                <li>Prediction history</li>
+                <li>Secure access</li>
+            </ul>
+        </div>
+    </aside>
+</section>
+{% endblock %}

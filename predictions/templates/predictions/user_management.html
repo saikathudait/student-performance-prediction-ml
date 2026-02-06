@@ -1,0 +1,113 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'predictions/css/staff.css' %}">
+    <script defer src="{% static 'predictions/js/staff-users.js' %}"></script>
+</head>
+<body class="staff-body">
+    <header class="staff-topbar">
+        <div class="brand">
+            <span class="brand-mark">SP</span>
+            <div>
+                <p class="brand-title">Student Performance Admin</p>
+                <p class="brand-sub">Staff Control Center</p>
+            </div>
+        </div>
+        <div class="topbar-right">
+            <nav class="staff-nav">
+                <a class="nav-link" href="{% url 'predictions:dashboard' %}">Dashboard</a>
+                <a class="nav-link" href="{% url 'predictions:records' %}">All Predictions</a>
+                <a class="nav-link" href="{% url 'predictions:analytics' %}">Analytics</a>
+                <a class="nav-link" href="{% url 'predictions:form' %}">Create Prediction</a>
+                <a class="nav-link" href="{% url 'predictions:contact' %}">Feedback Inbox</a>
+                <a class="nav-link active" href="{% url 'superadmin_users' %}">User Management</a>
+                <a class="nav-link nav-logout" href="{% url 'predictions:logout' %}">Logout</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="staff-shell">
+        <main class="staff-content">
+            <section class="staff-hero">
+                <div>
+                    <p class="staff-eyebrow">Administration</p>
+                    <h1>User Management</h1>
+                    <p class="staff-lead">Manage staff access, activation, and user roles.</p>
+                </div>
+                <div class="staff-clock" id="staff-clock">--:--</div>
+            </section>
+
+            {% if messages %}
+            <section class="staff-panel">
+                {% for message in messages %}
+                <p class="staff-message">{{ message }}</p>
+                {% endfor %}
+            </section>
+            {% endif %}
+
+            <section class="staff-panel">
+                <div class="panel-header">
+                    <h2>All Users</h2>
+                    <input id="user-search" class="panel-search" type="search" placeholder="Search by username or email...">
+                </div>
+                <div class="table-wrapper">
+                    <table class="staff-table">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Staff</th>
+                                <th>Superuser</th>
+                                <th>Active</th>
+                                <th>Joined</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="user-table-body">
+                            {% for user in users %}
+                            <tr>
+                                <td>{{ user.username }}</td>
+                                <td>{{ user.email|default:"-" }}</td>
+                                <td>{{ user.is_staff|yesno:"Yes,No" }}</td>
+                                <td>{{ user.is_superuser|yesno:"Yes,No" }}</td>
+                                <td>{{ user.is_active|yesno:"Yes,No" }}</td>
+                                <td>{{ user.date_joined|date:"M d, Y" }}</td>
+                                <td>
+                                    <form method="post" class="inline-form">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="user_id" value="{{ user.id }}">
+                                        <button class="action-btn" name="action" value="toggle_staff" type="submit">Toggle Staff</button>
+                                        <button class="action-btn" name="action" value="toggle_superuser" type="submit">Toggle Admin</button>
+                                        <button class="action-btn" name="action" value="toggle_active" type="submit">Activate/Block</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <footer class="staff-footer">
+        <div class="staff-footer-inner">
+            <div>
+                <p class="footer-title">Student Performance Admin</p>
+                <p class="footer-sub">Administrative oversight and system monitoring.</p>
+            </div>
+            <div class="footer-meta">
+                <p>© 2026 Student Performance Lab</p>
+                <p>All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,132 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'predictions/css/staff.css' %}">
+    <script defer src="{% static 'predictions/js/staff.js' %}"></script>
+</head>
+<body class="staff-body">
+    <header class="staff-topbar">
+        <div class="brand">
+            <span class="brand-mark">SP</span>
+            <div>
+                <p class="brand-title">Student Performance Admin</p>
+                <p class="brand-sub">Staff Control Center</p>
+            </div>
+        </div>
+        <div class="topbar-right">
+            <nav class="staff-nav">
+                <a class="nav-link {% if request.path == '/superadmin/' %}active{% endif %}" href="{% url 'predictions:dashboard' %}">Dashboard</a>
+                <a class="nav-link" href="{% url 'predictions:records' %}">All Predictions</a>
+                <a class="nav-link" href="{% url 'predictions:analytics' %}">Analytics</a>
+                <a class="nav-link" href="{% url 'predictions:form' %}">Create Prediction</a>
+                <a class="nav-link" href="{% url 'predictions:contact' %}">Feedback Inbox</a>
+                <a class="nav-link" href="{% url 'superadmin_users' %}">User Management</a>
+                <a class="nav-link nav-logout" href="{% url 'predictions:logout' %}">Logout</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="staff-shell">
+        <main class="staff-content">
+            <section class="staff-hero">
+                <div>
+                    <p class="staff-eyebrow">Administration</p>
+                    <h1>Student Performance Control Center</h1>
+                    <p class="staff-lead">Track system activity, monitor outcomes, and guide decisions with confidence.</p>
+                </div>
+                <div class="staff-clock" id="staff-clock">--:--</div>
+            </section>
+
+            <section class="staff-stats">
+                <div class="stat-card">
+                    <span>Total Predictions</span>
+                    <strong>{{ totals }}</strong>
+                </div>
+                <div class="stat-card">
+                    <span>Pass Rate</span>
+                    <strong>{{ pass_rate }}%</strong>
+                </div>
+                <div class="stat-card">
+                    <span>Pass Count</span>
+                    <strong>{{ pass_count }}</strong>
+                </div>
+                <div class="stat-card">
+                    <span>Fail Count</span>
+                    <strong>{{ fail_count }}</strong>
+                </div>
+                <div class="stat-card">
+                    <span>Registered Users</span>
+                    <strong>{{ user_count }}</strong>
+                </div>
+                <div class="stat-card">
+                    <span>Messages</span>
+                    <strong>{{ contact_count }}</strong>
+                </div>
+            </section>
+
+            <section class="staff-panel">
+                <div class="panel-header">
+                    <h2>Recent Predictions</h2>
+                    <input id="staff-search" class="panel-search" type="search" placeholder="Search by student name...">
+                </div>
+                <div class="table-wrapper">
+                    <table class="staff-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Age</th>
+                                <th>G1</th>
+                                <th>G2</th>
+                                <th>Absences</th>
+                                <th>Result</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="staff-table-body">
+                            {% for record in recent %}
+                            <tr>
+                                <td>{{ record.full_name }}</td>
+                                <td>{{ record.age }}</td>
+                                <td>{{ record.g1 }}</td>
+                                <td>{{ record.g2 }}</td>
+                                <td>{{ record.absences }}</td>
+                                <td>
+                                    <span class="pill {% if record.prediction == 'PASS' %}pass{% else %}fail{% endif %}">
+                                        {{ record.prediction }}
+                                    </span>
+                                </td>
+                                <td>{{ record.created_at|date:"M d, Y H:i" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="empty">No predictions yet.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <footer class="staff-footer">
+        <div class="staff-footer-inner">
+            <div>
+                <p class="footer-title">Student Performance Admin</p>
+                <p class="footer-sub">Administrative oversight and system monitoring.</p>
+            </div>
+            <div class="footer-meta">
+                <p>© 2026 Student Performance Lab</p>
+                <p>All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

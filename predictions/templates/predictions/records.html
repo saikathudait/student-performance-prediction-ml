@@ -1,0 +1,65 @@
+{% extends "predictions/base.html" %}
+
+{% block title %}Prediction Records{% endblock %}
+
+{% block content %}
+<section class="page-hero" data-reveal>
+    <div>
+        <p class="eyebrow">Prediction Records</p>
+        <h1>Stored Predictions</h1>
+        <p class="hero-lead">Explore every prediction saved in the system, with quick filters and summaries.</p>
+    </div>
+</section>
+
+<section class="records-panel" data-reveal>
+    <div class="records-header">
+        <div>
+            <h2>Student Predictions</h2>
+            <p class="muted">{{ records|length }} total record{{ records|length|pluralize }}</p>
+        </div>
+        <div class="records-actions">
+            <input id="record-filter" class="input" type="search" placeholder="Search by name...">
+            <a class="btn btn-primary" href="{% url 'predictions:form' %}">New Prediction</a>
+        </div>
+    </div>
+
+    <div class="table-wrapper">
+        <table class="records-table">
+            <thead>
+                <tr>
+                    <th>Student Name</th>
+                    <th>Age</th>
+                    <th>G1</th>
+                    <th>G2</th>
+                    <th>Absences</th>
+                    <th>Prediction</th>
+                    <th>Date &amp; Time</th>
+                </tr>
+            </thead>
+            <tbody id="records-body">
+                {% if records %}
+                    {% for record in records %}
+                    <tr>
+                        <td>{{ record.full_name }}</td>
+                        <td>{{ record.age }}</td>
+                        <td>{{ record.g1 }}</td>
+                        <td>{{ record.g2 }}</td>
+                        <td>{{ record.absences }}</td>
+                        <td>
+                            <span class="pill {% if record.prediction == 'PASS' %}pass{% else %}fail{% endif %}">
+                                {{ record.prediction }}
+                            </span>
+                        </td>
+                        <td>{{ record.created_at|date:"M d, Y H:i" }}</td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="empty">No predictions yet. Start by running a new prediction.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'predictions/css/admin-dashboard.css' %}">
+{% endblock %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <script defer src="{% static 'predictions/js/admin-dashboard.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="admin-hero">
+    <div>
+        <p class="admin-eyebrow">Administration</p>
+        <h1>Student Performance Control Center</h1>
+        <p class="admin-lead">Manage users, review predictions, and keep system data organized.</p>
+    </div>
+    <div class="admin-hero-card">
+        <div class="admin-clock" id="admin-clock">--:--</div>
+        <p class="admin-sub">Welcome back, {{ request.user.get_full_name|default:request.user.username }}</p>
+    </div>
+</div>
+
+<div class="admin-actions">
+    <input id="admin-search" class="admin-input" type="search" placeholder="Search modules...">
+    <a class="button" href="{% url 'predictions:dashboard' %}">Open Admin Dashboard</a>
+</div>
+
+<div class="admin-grid" id="admin-grid">
+    {% if app_list %}
+        {% for app in app_list %}
+        <section class="admin-card" data-module>
+            <header>
+                <h2>{{ app.name }}</h2>
+                <span class="admin-badge">Modules</span>
+            </header>
+            <ul>
+                {% for model in app.models %}
+                <li>
+                    <a href="{{ model.admin_url }}">{{ model.name }}</a>
+                    {% if model.add_url %}
+                    <a class="admin-link" href="{{ model.add_url }}">Add</a>
+                    {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+        </section>
+        {% endfor %}
+    {% else %}
+        <p>No modules available.</p>
+    {% endif %}
+</div>
+{% endblock %}

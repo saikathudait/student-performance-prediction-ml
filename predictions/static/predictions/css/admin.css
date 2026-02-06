@@ -1,0 +1,138 @@
+:root {
+    --admin-accent: #2aa6ff;
+    --admin-accent-strong: #1b8edb;
+    --admin-warm: #f08b3e;
+    --admin-dark: #0b1220;
+    --admin-panel: rgba(15, 23, 42, 0.9);
+    --admin-border: rgba(148, 163, 184, 0.25);
+    --admin-text: #e2e8f0;
+    --admin-muted: #94a3b8;
+}
+
+body {
+    background: var(--admin-dark);
+    color: var(--admin-text);
+}
+
+#container,
+#content {
+    background: transparent;
+}
+
+#header {
+    background: linear-gradient(90deg, #1f6feb 0%, #2aa6ff 40%, #f08b3e 100%);
+    color: #fff;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+}
+
+#branding h1 a,
+#branding h1 a:visited {
+    color: #fff;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+}
+
+#user-tools,
+#user-tools a,
+#user-tools a:visited {
+    color: rgba(255, 255, 255, 0.92);
+}
+
+#user-tools a:hover {
+    color: #fff;
+}
+
+div.breadcrumbs {
+    background: rgba(15, 23, 42, 0.85);
+    color: var(--admin-muted);
+    border-bottom: 1px solid var(--admin-border);
+}
+
+#nav-sidebar {
+    background: var(--admin-panel);
+    border-right: 1px solid var(--admin-border);
+}
+
+#nav-sidebar input[type=search],
+#nav-sidebar input[type=text] {
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid var(--admin-border);
+    color: var(--admin-text);
+    border-radius: 10px;
+    padding: 0.4rem 0.6rem;
+}
+
+#nav-sidebar .current-app .section,
+#nav-sidebar .current-model {
+    background: rgba(42, 166, 255, 0.12);
+    border-radius: 8px;
+}
+
+#nav-sidebar .app-caption,
+#nav-sidebar .section {
+    color: var(--admin-muted);
+}
+
+#nav-sidebar a {
+    color: var(--admin-text);
+}
+
+#nav-sidebar a:hover {
+    color: #fff;
+}
+
+.module h2,
+.module caption {
+    background: rgba(42, 166, 255, 0.12);
+    color: var(--admin-text);
+    border-bottom: 1px solid var(--admin-border);
+}
+
+.module {
+    background: rgba(15, 23, 42, 0.7);
+    border: 1px solid var(--admin-border);
+}
+
+.dashboard .module {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.button,
+input[type=submit],
+input[type=button],
+.submit-row input,
+a.button {
+    background: var(--admin-accent);
+    border-color: var(--admin-accent-strong);
+    color: #fff;
+    border-radius: 8px;
+}
+
+.button:hover,
+input[type=submit]:hover,
+input[type=button]:hover,
+.submit-row input:hover,
+a.button:hover {
+    background: var(--admin-accent-strong);
+}
+
+input[type=text],
+input[type=password],
+input[type=email],
+textarea,
+select {
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid var(--admin-border);
+    color: var(--admin-text);
+}
+
+table,
+.results table {
+    color: var(--admin-text);
+}
+
+.results tr:nth-child(odd),
+.results tr:nth-child(even) {
+    background: rgba(15, 23, 42, 0.65);
+}

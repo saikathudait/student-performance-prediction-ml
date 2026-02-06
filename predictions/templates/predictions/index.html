@@ -1,0 +1,88 @@
+{% extends "predictions/base.html" %}
+
+{% block title %}Student Performance Prediction{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-content">
+        <p class="eyebrow">Student Success Insights</p>
+        <h1>Student Performance Prediction System</h1>
+        <p class="hero-lead">
+            Predict pass or fail outcomes in seconds. Capture academic, personal, and behavioural details, then
+            keep every result in one place for quick review.
+        </p>
+        <div class="hero-actions">
+            <a class="btn btn-primary" href="{% url 'predictions:form' %}">Predict Student Performance</a>
+            <a class="btn btn-secondary" href="{% url 'predictions:records' %}">View Prediction Records</a>
+        </div>
+        <div class="hero-metrics">
+            <div class="metric-card" data-reveal>
+                <span class="metric-value">Fast</span>
+                <span class="metric-label">Instant Prediction</span>
+            </div>
+            <div class="metric-card" data-reveal>
+                <span class="metric-value">Clear</span>
+                <span class="metric-label">Pass/Fail Result</span>
+            </div>
+            <div class="metric-card" data-reveal>
+                <span class="metric-value">Secure</span>
+                <span class="metric-label">Saved Records</span>
+            </div>
+        </div>
+    </div>
+    <div class="hero-visual" data-reveal>
+        <div class="glass-card">
+            <h3>How It Works</h3>
+            <ol class="flow-list">
+                <li>Enter student details</li>
+                <li>Generate a prediction</li>
+                <li>Review the outcome</li>
+                <li>Save and track history</li>
+            </ol>
+        </div>
+        <div class="score-card">
+        <p class="score-label">Sample Outcome</p>
+            <div class="score-pill pass">PASS</div>
+            <p class="score-sub">Based on academic trajectory</p>
+        </div>
+    </div>
+</section>
+
+<section class="section" data-reveal>
+    <h2>Why this system stands out</h2>
+    <div class="card-grid">
+        <article class="card">
+            <h3>End-to-End Workflow</h3>
+            <p>From data capture to prediction storage, everything stays organized and easy to access.</p>
+        </article>
+        <article class="card">
+            <h3>Model-Ready UI</h3>
+            <p>Every form field is validated to keep data accurate and consistent.</p>
+        </article>
+        <article class="card">
+            <h3>Instant Insights</h3>
+            <p>View prediction history and explore academic summaries for each student.</p>
+        </article>
+    </div>
+</section>
+
+<section class="section layout-split" data-reveal>
+    <div>
+        <h2>Simple Workflow</h2>
+        <p>A clean, easy-to-follow experience that keeps the focus on student outcomes.</p>
+        <ul class="feature-list">
+            <li>Step-by-step input form</li>
+            <li>Instant result screen</li>
+            <li>Saved prediction history</li>
+            <li>Clear academic summaries</li>
+        </ul>
+    </div>
+    <div class="workflow">
+        <div class="workflow-step">Input</div>
+        <div class="workflow-step">Review</div>
+        <div class="workflow-step">Result</div>
+        <div class="workflow-step">Save</div>
+        <div class="workflow-step">History</div>
+    </div>
+</section>
+{% endblock %}

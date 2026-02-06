@@ -1,0 +1,51 @@
+{% extends "predictions/base.html" %}
+
+{% block title %}Student Dashboard{% endblock %}
+
+{% block content %}
+<section class="page-hero" data-reveal>
+    <div>
+        <p class="eyebrow">Student Dashboard</p>
+        <h1>Welcome, {{ request.user.first_name|default:request.user.username }}</h1>
+        <p class="hero-lead">Manage predictions, view your history, and keep your profile updated.</p>
+    </div>
+</section>
+
+<section class="section stats-grid" data-reveal>
+    <div class="stat-card">
+        <span class="stat-label">Your Predictions</span>
+        <strong>{{ prediction_count }}</strong>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">Account Status</span>
+        <strong>Active</strong>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">Next Step</span>
+        <strong>New Prediction</strong>
+    </div>
+</section>
+
+<section class="section card-grid" data-reveal>
+    <article class="card">
+        <h3>Predict Performance</h3>
+        <p>Run a new prediction with updated academic data.</p>
+        <a class="btn btn-primary" href="{% url 'predictions:form' %}">Start Prediction</a>
+    </article>
+    <article class="card">
+        <h3>View My Predictions</h3>
+        <p>Review your past predictions and outcomes.</p>
+        <a class="btn btn-secondary" href="{% url 'predictions:history' %}">My History</a>
+    </article>
+    <article class="card">
+        <h3>Profile</h3>
+        <p>Check your account information and summary.</p>
+        <a class="btn btn-secondary" href="{% url 'predictions:profile' %}">View Profile</a>
+    </article>
+    <article class="card">
+        <h3>Logout</h3>
+        <p>End your session safely.</p>
+        <a class="btn btn-tertiary" href="{% url 'predictions:logout' %}">Logout</a>
+    </article>
+</section>
+{% endblock %}
